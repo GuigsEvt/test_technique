@@ -13,3 +13,4 @@ __pycache__/
 .ruff_cache/
 app/data/chroma/
 app/data/registry.json
+app/data/conversations.db

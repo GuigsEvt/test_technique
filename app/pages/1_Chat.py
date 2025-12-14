@@ -38,13 +38,13 @@ RETRIEVAL_PRESETS = {
 DEFAULT_PRESET = "PoC safe (recommande)"
 
 st.set_page_config(page_title="Chat", page_icon="💬", layout="wide")
-state.init_state()
-
 try:
     base_settings = get_settings()
 except RuntimeError as exc:
     st.error(str(exc))
     st.stop()
+
+state.init_state(base_settings.conversation_db)
 
 st.sidebar.header("Conversations")
 if st.sidebar.button("Nouvelle conversation", use_container_width=True):
@@ -52,8 +52,17 @@ if st.sidebar.button("Nouvelle conversation", use_container_width=True):
 
 for conv_id in state.list_conversations():
     title = st.session_state.get(f"title_{conv_id}", "Conversation")
-    if st.sidebar.button(title, key=conv_id):
-        state.select_conversation(conv_id)
+    with st.sidebar.container():
+        cols = st.columns([4, 1])
+        if cols[0].button(title, key=conv_id, use_container_width=True):
+            state.select_conversation(conv_id)
+        if cols[1].button("🗑️", key=f"del_{conv_id}"):
+            state.delete_conversation(conv_id)
+            st.rerun()
+
+# Auto-select the first conversation so messages are visible on load
+if not st.session_state.current_conversation and state.list_conversations():
+    state.select_conversation(state.list_conversations()[0])
 
 with st.sidebar.expander("Mode de recherche", expanded=True):
     preset_name = st.radio(

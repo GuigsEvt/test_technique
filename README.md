@@ -5,9 +5,9 @@ Application Streamlit multipage (Chat + Documents) avec pipeline RAG strict. Ré
 ### Fonctionnalités
 - Upload multiples `.txt`, `.csv`, `.html` avec nettoyage, chunking, embeddings et upsert dans Chroma
 - Suppression par document (supprime tous les chunks liés)
-- Chat avec historique multi-conversations (session_state) et affichage des sources utilisées
+- Chat avec historique multi-conversations (persisté en SQLite) et affichage des sources utilisées
 - Garde-fous : refus hors corpus, seuil de similarité, détection basique d'injection
-- Persistence index/chunks sur disque (`app/data/chroma/`), registre des documents JSON
+- Persistance : index/chunks sur disque (`app/data/chroma/`), registre des documents JSON, conversations dans `app/data/conversations.db`
 
 ### Structure
 - app/Home.py : page d'accueil
@@ -37,6 +37,11 @@ Copiez `.env.example` vers `.env` et renseignez `OPENAI_API_KEY`.
 streamlit run app/Home.py
 ```
 Page Documents : uploadez des fichiers, vérifiez le compteur de chunks/documents. Page Chat : posez vos questions, l'app répond uniquement si des sources pertinentes sont trouvées, sinon message "Je ne sais pas d'après les documents fournis." Les sources sont listées dans un expander.
+
+### Stockage des conversations
+- Local uniquement : SQLite `app/data/conversations.db` (créé au lancement), pas de télémetrie externe.
+- Chaque message est inséré en base; les conversations sont rechargées au démarrage pour retrouver l'historique.
+- Pour repartir de zéro : supprimez `app/data/conversations.db` (optionnel, l'app le recréera).
 
 ### Tests
 ```bash
