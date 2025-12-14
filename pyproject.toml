@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-chat-poc"
+version = "0.1.0"
+description = "Streamlit RAG chatbot with document management"
+authors = [{name = "Guillaume Evrat", email = "evrat.guillaume@gmail.com"}]
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit>=1.37",
+    "chromadb>=0.5.3",
+    "openai>=1.40.0",
+    "python-dotenv>=1.0",
+    "beautifulsoup4>=4.12",
+]
+
+[tool.setuptools]
+packages = {find = {include = ["app*"], exclude = ["data*", "tests*", "scripts*"]}}
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
