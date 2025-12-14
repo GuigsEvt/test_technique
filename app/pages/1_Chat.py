@@ -96,17 +96,18 @@ if prompt:
     with st.chat_message("user"):
         st.markdown(prompt)
     try:
-        contexts = retrieve(prompt, settings)
-        if not contexts:
-            bot_answer = FALLBACK
-            sources = []
-        else:
-            result = generate_answer(prompt, contexts, settings)
-            bot_answer = result.get("answer", FALLBACK)
-            sources = result.get("sources", [])
-
-        state.append_message("assistant", bot_answer)
         with st.chat_message("assistant"):
+            with st.spinner("Je réfléchis…"):
+                contexts = retrieve(prompt, settings)
+                if not contexts:
+                    bot_answer = FALLBACK
+                    sources = []
+                else:
+                    result = generate_answer(prompt, contexts, settings)
+                    bot_answer = result.get("answer", FALLBACK)
+                    sources = result.get("sources", [])
+
+            state.append_message("assistant", bot_answer)
             st.markdown(bot_answer)
             components.render_sources(sources)
     except RetrievalError as exc:
