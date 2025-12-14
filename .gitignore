@@ -14,3 +14,4 @@ __pycache__/
 app/data/chroma/
 app/data/registry.json
 app/data/conversations.db
+app/data/raw/
