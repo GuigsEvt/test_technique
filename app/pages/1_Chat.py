@@ -16,26 +16,20 @@ logger = get_logger(__name__)
 
 
 RETRIEVAL_PRESETS = {
-    "PoC safe (recommande)": {
-        "top_k": 12,
-        "max_distance": 0.28,
-        "max_chunks": 6,
-        "tagline": "Bon rappel + sources vérifiées (recommandé pour une démonstration).",
-    },
-    "Tres strict": {
-        "top_k": 8,
-        "max_distance": 0.22,
-        "max_chunks": 4,
-        "tagline": "Hallucinations minimales ; peut répondre plus souvent \"Je ne sais pas\".",
-    },
-    "Exploratoire": {
+    "Exploratoire (recommande)": {
         "top_k": 20,
         "max_distance": 0.45,
         "max_chunks": 8,
-        "tagline": "Couverture maximale des données; nécessite une requête très précise pour canaliser la réponse.",
+        "tagline": "Couverture maximale des données; recommandé pour explorer le corpus.",
+    },
+    "Strict": {
+        "top_k": 12,
+        "max_distance": 0.28,
+        "max_chunks": 6,
+        "tagline": "Priorise la précision; davantage de refus si les sources sont faibles.",
     },
 }
-DEFAULT_PRESET = "PoC safe (recommande)"
+DEFAULT_PRESET = "Exploratoire (recommande)"
 
 st.set_page_config(page_title="Chat", page_icon="💬", layout="wide")
 try:
