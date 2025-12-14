@@ -38,6 +38,8 @@ def generate_answer(question: str, contexts: List[Dict], settings: Settings) -> 
     answer_text = (choice or "").strip()
     if not answer_text:
         return {"answer": FALLBACK, "sources": []}
+    if answer_text == FALLBACK:
+        return {"answer": FALLBACK, "sources": []}
 
     sources = _format_sources(contexts)
     if not sources:
