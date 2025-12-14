@@ -89,6 +89,9 @@ for message in state.current_messages():
 prompt = st.chat_input("Posez votre question")
 if prompt:
     state.append_message("user", prompt)
+    
+    with st.chat_message("user"):
+        st.markdown(prompt)
     try:
         contexts = retrieve(prompt, settings)
         if not contexts:
