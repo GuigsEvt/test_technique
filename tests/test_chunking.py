@@ -3,7 +3,14 @@ from app.core.utils import make_chunks
 
 def test_make_chunks_overlap_and_metadata():
     text = "A" * 2500
-    chunks = make_chunks(text, doc_id="doc::1", filename="file.txt", source_type=".txt", max_chars=1000, overlap=200)
+    chunks = make_chunks(
+        text,
+        doc_id="doc::1",
+        filename="file.txt",
+        source_type=".txt",
+        max_chars=1000,
+        overlap=200,
+    )
     assert len(chunks) == 3
 
     _, first, _ = chunks[0]

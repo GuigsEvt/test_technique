@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Dict, List
 
 import streamlit as st
 
@@ -33,13 +32,16 @@ RETRIEVAL_PRESETS = {
 DEFAULT_PRESET = "Exploratoire (recommande)"
 
 
-def build_search_query(latest_question: str, history: List[Dict[str, str]], window: int = 6) -> str:
+def build_search_query(
+    latest_question: str, history: list[dict[str, str]], window: int = 6
+) -> str:
     """Combine recent user messages to preserve conversational intent during retrieval."""
     user_messages = [msg["content"] for msg in history if msg.get("role") == "user"]
     recent = user_messages[-window:]
     if not recent or recent[-1] != latest_question:
         recent.append(latest_question)
     return "\n\n".join(recent).strip()
+
 
 st.set_page_config(page_title="Chat", page_icon="💬", layout="wide")
 try:
@@ -73,7 +75,7 @@ with st.sidebar.expander("Mode de recherche", expanded=True):
         "Rigueur vs rappel",
         options=list(RETRIEVAL_PRESETS.keys()),
         index=list(RETRIEVAL_PRESETS.keys()).index(DEFAULT_PRESET),
-        help="Ajustez la rigueur de la recherche d'informations (retriever) avant la génération de la réponse.",
+        help="Règle la recherche (retriever) avant la génération de la réponse.",
     )
     preset = RETRIEVAL_PRESETS[preset_name]
     settings = replace(
@@ -83,7 +85,9 @@ with st.sidebar.expander("Mode de recherche", expanded=True):
         max_chunks=preset["max_chunks"],
     )
     st.caption(
-        f"{preset['tagline']}\nTop-k: {settings.top_k} • Seuil distance: {settings.max_distance} • Chunks max: {settings.max_chunks}"
+        f"{preset['tagline']}\n"
+        f"Top-k: {settings.top_k} • Seuil distance: {settings.max_distance} • "
+        f"Chunks max: {settings.max_chunks}"
     )
 
 registry = load_registry(settings.registry_path)
@@ -111,9 +115,7 @@ if prompt:
         try:
             with st.chat_message("assistant"):
                 with st.spinner("Je réfléchis…"):
-                    search_query = build_search_query(
-                        prompt, history_messages
-                    )
+                    search_query = build_search_query(prompt, history_messages)
                     contexts = retrieve(search_query, settings)
                     if not contexts:
                         bot_answer = FALLBACK

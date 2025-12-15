@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict, List
-
 from openai import OpenAI
 
 from app.core.errors import LLMError
@@ -12,7 +10,7 @@ from app.rag.prompts import SYSTEM_PROMPT, format_user_prompt
 FALLBACK = "Je ne sais pas d'après les documents fournis."
 
 
-def generate_answer(question: str, contexts: List[Dict], settings: Settings) -> Dict:
+def generate_answer(question: str, contexts: list[dict], settings: Settings) -> dict:
     if not contexts:
         return {"answer": FALLBACK, "sources": []}
     if not is_prompt_safe(question):
@@ -28,7 +26,7 @@ def generate_answer(question: str, contexts: List[Dict], settings: Settings) -> 
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.1, # Low temperature for more focused answers; ideal for RAGs
+            temperature=0.1,  # Low temperature for more focused answers; ideal for RAGs
             max_tokens=500,
         )
     except Exception as exc:  # pragma: no cover - network
@@ -48,8 +46,8 @@ def generate_answer(question: str, contexts: List[Dict], settings: Settings) -> 
     return {"answer": answer_text, "sources": sources}
 
 
-def _format_sources(contexts: List[Dict]) -> List[Dict]:
-    formatted: List[Dict] = []
+def _format_sources(contexts: list[dict]) -> list[dict]:
+    formatted: list[dict] = []
     for ctx in contexts:
         meta = ctx.get("metadata", {})
         formatted.append(

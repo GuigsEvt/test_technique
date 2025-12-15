@@ -37,5 +37,7 @@ class Settings:
 def get_settings() -> Settings:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY manquant. Définissez la variable d'environnement.")
+        raise RuntimeError(
+            "OPENAI_API_KEY manquant. Définissez la variable d'environnement."
+        )
     return Settings(openai_api_key=api_key)

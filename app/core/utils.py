@@ -6,7 +6,6 @@ import io
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
 
 from bs4 import BeautifulSoup
 
@@ -29,14 +28,13 @@ def normalize_text(text: str) -> str:
 
 def strip_html(html: str) -> str:
     """
-    Removes HTML tags, script and style elements from the input HTML string, normalizes the extracted text, 
-    and returns the cleaned text with lines separated by newlines.
+    Remove tags plus script/style content, normalize text, return newline-separated plain text.
 
     Args:
         html (str): The HTML content to be stripped and cleaned.
 
     Returns:
-        str: The normalized plain text extracted from the HTML, with script and style contents removed.
+        str: Plain text extracted from the HTML with script and style contents removed.
     """
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style"]):
@@ -52,14 +50,14 @@ def csv_to_text(csv_content: str, max_rows: int = 200) -> str:
 
     Args:
         csv_content (str): The CSV data as a string.
-        max_rows (int, optional): The maximum number of rows to include in the output. 
-            If the CSV contains more rows, the output will be truncated and a message will be appended. Defaults to 200.
+        max_rows (int, optional): Maximum number of rows to include. Additional rows are truncated
+            and a notice is appended. Defaults to 200.
 
     Returns:
-        str: The formatted text representation of the CSV, with cells separated by ' | ' and rows separated by newlines.
-             If the number of rows exceeds `max_rows`, the output is truncated with a notice.
+        str: Formatted CSV with cells separated by " | " and rows by newlines.
+            Truncated with a notice if rows exceed `max_rows`.
     """
-    output_lines: List[str] = []
+    output_lines: list[str] = []
     reader = csv.reader(io.StringIO(csv_content))
     for idx, row in enumerate(reader):
         if idx >= max_rows:
@@ -82,23 +80,21 @@ def make_chunks(
     source_type: str,
     max_chars: int = 1200,
     overlap: int = 180,
-) -> List[Tuple[str, str, dict]]:
+) -> list[tuple[str, str, dict]]:
     """
-    Splits a given text into overlapping chunks of specified maximum character length.
+    Split a text into overlapping chunks of a maximum length.
 
     Args:
-        text (str): The input text to be chunked.
+        text (str): Text to chunk.
         doc_id (str): Identifier for the document.
         filename (str): Name of the source file.
         source_type (str): Type or origin of the source.
-        max_chars (int, optional): Maximum number of characters per chunk. Defaults to 1200.
-        overlap (int, optional): Number of overlapping characters between consecutive chunks. Defaults to 180.
+        max_chars (int, optional): Max characters per chunk. Defaults to 1200.
+        overlap (int, optional): Overlap between chunks. Defaults to 180.
 
     Returns:
-        List[Tuple[str, str, dict]]: A list of tuples, each containing:
-            - chunk_id (str): Unique identifier for the chunk.
-            - chunk_text (str): The chunked text segment.
-            - metadata (dict): Metadata including document ID, filename, source type, chunk index, and character range.
+        List[Tuple[str, str, dict]]: Each tuple contains chunk_id, chunk_text, and metadata
+            (doc ID, filename, source type, chunk index, character range).
 
     If the input text is empty or only whitespace, returns an empty list.
     """
@@ -106,7 +102,7 @@ def make_chunks(
     if not normalized:
         return []
     step = max_chars - overlap if max_chars > overlap else max_chars
-    chunks: List[Tuple[str, str, dict]] = []
+    chunks: list[tuple[str, str, dict]] = []
     for idx, start in enumerate(range(0, len(normalized), step)):
         chunk_text = normalized[start : start + max_chars]
         metadata = {

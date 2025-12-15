@@ -4,7 +4,6 @@ import logging
 import sqlite3
 import uuid
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import streamlit as st
 
@@ -23,7 +22,7 @@ def init_state(db_path: Path) -> None:
         st.session_state.current_conversation = None
 
 
-def new_conversation(title: str | None = None, headline: Optional[str] = None) -> str:
+def new_conversation(title: str | None = None, headline: str | None = None) -> str:
     conv_id = str(uuid.uuid4())
     resolved_title = title or "Conversation"
     st.session_state.conversations[conv_id] = []
@@ -35,7 +34,7 @@ def new_conversation(title: str | None = None, headline: Optional[str] = None) -
     return conv_id
 
 
-def list_conversations() -> List[str]:
+def list_conversations() -> list[str]:
     return list(st.session_state.conversations.keys())[::-1]
 
 
@@ -64,7 +63,7 @@ def append_message(role: str, content: str) -> None:
     _insert_message(conv_id, role, content)
 
 
-def current_messages() -> List[Dict[str, str]]:
+def current_messages() -> list[dict[str, str]]:
     conv_id = st.session_state.current_conversation
     if not conv_id:
         return []
@@ -103,8 +102,8 @@ def _ensure_db(db_path: Path) -> None:
         conn.commit()
 
 
-def _load_conversations(db_path: Path) -> Dict[str, List[Dict[str, str]]]:
-    conversations: Dict[str, List[Dict[str, str]]] = {}
+def _load_conversations(db_path: Path) -> dict[str, list[dict[str, str]]]:
+    conversations: dict[str, list[dict[str, str]]] = {}
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         for row in conn.execute(
@@ -124,7 +123,7 @@ def _load_conversations(db_path: Path) -> Dict[str, List[Dict[str, str]]]:
     return conversations
 
 
-def _insert_conversation(conv_id: str, title: str, headline: Optional[str]) -> None:
+def _insert_conversation(conv_id: str, title: str, headline: str | None) -> None:
     db_path = Path(st.session_state["conversation_db_path"])
     try:
         with sqlite3.connect(db_path) as conn:

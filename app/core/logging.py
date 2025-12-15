@@ -1,7 +1,6 @@
 import logging
-from typing import Optional
 
-_LOGGER: Optional[logging.Logger] = None
+_LOGGER: logging.Logger | None = None
 
 
 def get_logger(name: str = "app") -> logging.Logger:

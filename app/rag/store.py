@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
 
 import chromadb
 from chromadb.api.models.Collection import Collection
@@ -20,30 +20,18 @@ logger = get_logger(__name__)
 
 class OpenAIEmbedding(EmbeddingFunction):
     """
-    Embedding function that uses OpenAI's API to generate vector embeddings for a list of texts.
+    Embedding function that uses the OpenAI API to embed a list of texts.
 
     Args:
-        settings (Settings): Configuration object containing OpenAI API key and embedding model name.
-
-    Methods:
-        __init__(self, settings: Settings) -> None:
-            Initializes the OpenAIEmbedding instance with the provided settings and creates an OpenAI client.
-
-        __call__(self, texts: List[str]) -> List[List[float]]:
-            Generates embeddings for a list of input texts using the specified OpenAI embedding model.
-            
-            Args:
-                texts (List[str]): List of input strings to embed.
-            
-            Returns:
-                List[List[float]]: List of embedding vectors, one for each input text.
+        settings (Settings): Carries API key and embedding model name.
     """
+
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.client = OpenAI(api_key=settings.openai_api_key)
 
-    def __call__(self, texts: List[str]) -> List[List[float]]:  # type: ignore[override]
-        embeddings: List[List[float]] = []
+    def __call__(self, texts: list[str]) -> list[list[float]]:  # type: ignore[override]
+        embeddings: list[list[float]] = []
         for text in texts:
             response = self.client.embeddings.create(
                 model=self.settings.embedding_model,
@@ -66,7 +54,7 @@ def get_collection(settings: Settings) -> Collection:
         raise VectorStoreError(str(exc)) from exc
 
 
-def load_registry(path: Path) -> Dict[str, dict]:
+def load_registry(path: Path) -> dict[str, dict]:
     ensure_file(path)
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -74,12 +62,12 @@ def load_registry(path: Path) -> Dict[str, dict]:
         return {}
 
 
-def save_registry(path: Path, registry: Dict[str, dict]) -> None:
+def save_registry(path: Path, registry: dict[str, dict]) -> None:
     path.write_text(json.dumps(registry, indent=2), encoding="utf-8")
 
 
 def upsert_chunks(
-    collection: Collection, chunks: Iterable[Tuple[str, str, dict]]
+    collection: Collection, chunks: Iterable[tuple[str, str, dict]]
 ) -> int:
     """
     Inserts or updates multiple document chunks in the given collection.
@@ -126,10 +114,14 @@ def count_chunks(collection: Collection) -> int:
         return 0
 
 
-def fetch_document_chunks(collection: Collection, doc_id: str, limit: int = 3) -> List[dict]:
+def fetch_document_chunks(
+    collection: Collection, doc_id: str, limit: int = 3
+) -> list[dict]:
     """Retourne un aperçu des chunks d'un document donné."""
     try:
-        results = collection.get(where={"doc_id": doc_id}, include=["documents", "metadatas"])
+        results = collection.get(
+            where={"doc_id": doc_id}, include=["documents", "metadatas"]
+        )
     except Exception as exc:  # pragma: no cover - chroma internal
         raise VectorStoreError(str(exc)) from exc
 
@@ -138,8 +130,8 @@ def fetch_document_chunks(collection: Collection, doc_id: str, limit: int = 3) -
     if not documents or not metadatas:
         return []
 
-    entries: List[dict] = []
-    for text, metadata in zip(documents, metadatas):
+    entries: list[dict] = []
+    for text, metadata in zip(documents, metadatas, strict=False):
         entries.append({"text": text, "metadata": metadata})
 
     entries.sort(key=lambda item: item.get("metadata", {}).get("chunk_index", 0))

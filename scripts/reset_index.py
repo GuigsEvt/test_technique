@@ -1,4 +1,3 @@
-
 import shutil
 
 from app.core.settings import CHROMA_DIR, RAW_DIR, REGISTRY_PATH

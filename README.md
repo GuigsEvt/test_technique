@@ -48,6 +48,14 @@ Page Documents : uploadez des fichiers, vérifiez le compteur de chunks/document
 pytest
 ```
 
+### Lint / Format
+Ruff est le linter (peut aussi autofixer), Black est le formateur. Exécutez Ruff avant Black.
+```bash
+ruff check .
+ruff check . --fix  # optionnel pour corriger automatiquement
+black .
+```
+
 ### Garde-fous RAG
 - Pas de réponse sans contexte pertinent : fallback systématique
 - Seuil de distance (cosine) configurable (`max_distance`)

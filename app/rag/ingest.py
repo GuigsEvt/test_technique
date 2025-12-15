@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Tuple
 
 from app.core.errors import IngestError
 from app.core.logging import get_logger
@@ -10,7 +10,13 @@ from app.core.utils import compute_doc_id, make_chunks, normalize_text, now_iso
 from app.loaders.csv_loader import load_csv
 from app.loaders.html_loader import load_html
 from app.loaders.txt_loader import load_txt
-from app.rag.store import delete_document, get_collection, load_registry, save_registry, upsert_chunks
+from app.rag.store import (
+    delete_document,
+    get_collection,
+    load_registry,
+    save_registry,
+    upsert_chunks,
+)
 
 logger = get_logger(__name__)
 
@@ -30,7 +36,7 @@ def _validate_upload(filename: str, content: bytes) -> str:
     return ext
 
 
-def ingest_file(filename: str, content: bytes, settings: Settings) -> Tuple[str, int]:
+def ingest_file(filename: str, content: bytes, settings: Settings) -> tuple[str, int]:
     ext = _validate_upload(filename, content)
     loader = LOADERS[ext]
 

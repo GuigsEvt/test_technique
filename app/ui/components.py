@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Dict, Iterable
+from collections.abc import Iterable
 
 import streamlit as st
 
 
-def render_sources(sources: Iterable[Dict]) -> None:
+def render_sources(sources: Iterable[dict]) -> None:
     if not sources:
         return
     with st.expander("Sources"):
@@ -14,7 +14,9 @@ def render_sources(sources: Iterable[Dict]) -> None:
             chunk_idx = src.get("chunk_index", "?")
             score = src.get("score")
             preview = src.get("preview", "").strip()
-            score_txt = f" (score {score:.2f})" if isinstance(score, (int, float)) else ""
+            score_txt = (
+                f" (score {score:.2f})" if isinstance(score, (int, float)) else ""
+            )
             st.markdown(f"- **{filename}** (chunk {chunk_idx}){score_txt}")
             if preview:
                 st.caption(preview)
