@@ -76,5 +76,3 @@ python scripts/reset_index.py
 
 ### Limitations connues
 - Tests unitaires évitent l'appel réseau (pas de test e2e LLM)
-- Chunking approximatif (caractères) au lieu de tokens
-- CSV tronqué à 200 lignes pour éviter la verbosité
