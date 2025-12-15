@@ -6,7 +6,7 @@ from pathlib import Path
 from app.core.errors import IngestError
 from app.core.logging import get_logger
 from app.core.settings import Settings
-from app.core.utils import compute_doc_id, make_chunks, normalize_text, now_iso
+from app.core.utils import compute_doc_id, make_chunks, now_iso
 from app.loaders.csv_loader import load_csv
 from app.loaders.docx_loader import load_docx
 from app.loaders.html_loader import load_html
@@ -47,7 +47,7 @@ def ingest_file(filename: str, content: bytes, settings: Settings) -> tuple[str,
     loader = LOADERS[ext]
 
     raw_text = loader(content)
-    cleaned = normalize_text(raw_text)
+    cleaned = raw_text.strip()
     if not cleaned:
         raise IngestError("Le document ne contient pas de texte exploitable.")
 
