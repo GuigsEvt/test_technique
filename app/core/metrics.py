@@ -71,7 +71,9 @@ def fetch_summary(db_path: Path) -> dict[str, Any]:
     }
 
 
-def fetch_request_timeseries(db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00") -> list[dict[str, Any]]:
+def fetch_request_timeseries(
+    db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00"
+) -> list[dict[str, Any]]:
     """Return counts and success counts aggregated per time bucket."""
     init_metrics_db(db_path)
     with sqlite3.connect(db_path) as conn:
@@ -97,7 +99,9 @@ def fetch_request_timeseries(db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00") -
     ]
 
 
-def fetch_latency_timeseries(db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00") -> list[dict[str, Any]]:
+def fetch_latency_timeseries(
+    db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00"
+) -> list[dict[str, Any]]:
     """Return average total latency per time bucket."""
     init_metrics_db(db_path)
     with sqlite3.connect(db_path) as conn:
@@ -123,7 +127,9 @@ def fetch_latency_timeseries(db_path: Path, bucket: str = "%Y-%m-%dT%H:00:00") -
     ]
 
 
-def fetch_prompts_to_success(db_path: Path) -> tuple[list[dict[str, Any]], float | None]:
+def fetch_prompts_to_success(
+    db_path: Path,
+) -> tuple[list[dict[str, Any]], float | None]:
     """Return per-conversation prompts required before the first successful answer."""
     init_metrics_db(db_path)
     with sqlite3.connect(db_path) as conn:

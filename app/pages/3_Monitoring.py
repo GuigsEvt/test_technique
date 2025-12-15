@@ -29,7 +29,9 @@ col3.metric(
 )
 
 if not summary.get("total_requests"):
-    st.info("Pas encore de données. Posez une question dans le chat pour alimenter le monitoring.")
+    st.info(
+        "Pas encore de données. Posez une question dans le chat pour alimenter le monitoring."
+    )
     st.stop()
 
 st.subheader("Requêtes dans le temps")
