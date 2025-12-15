@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import Dict, List
 
 import streamlit as st
 
@@ -30,6 +31,15 @@ RETRIEVAL_PRESETS = {
     },
 }
 DEFAULT_PRESET = "Exploratoire (recommande)"
+
+
+def build_search_query(latest_question: str, history: List[Dict[str, str]], window: int = 6) -> str:
+    """Combine recent user messages to preserve conversational intent during retrieval."""
+    user_messages = [msg["content"] for msg in history if msg.get("role") == "user"]
+    recent = user_messages[-window:]
+    if not recent or recent[-1] != latest_question:
+        recent.append(latest_question)
+    return "\n\n".join(recent).strip()
 
 st.set_page_config(page_title="Chat", page_icon="💬", layout="wide")
 try:
@@ -85,34 +95,45 @@ col1.metric("Documents indexés", len(registry))
 col2.metric("Chunks", chunk_count)
 
 st.divider()
-for message in state.current_messages():
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
+chat_container = st.container()
 prompt = st.chat_input("Posez votre question")
-if prompt:
-    state.append_message("user", prompt)
-    
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    try:
-        with st.chat_message("assistant"):
-            with st.spinner("Je réfléchis…"):
-                contexts = retrieve(prompt, settings)
-                if not contexts:
-                    bot_answer = FALLBACK
-                    sources = []
-                else:
-                    result = generate_answer(prompt, contexts, settings)
-                    bot_answer = result.get("answer", FALLBACK)
-                    sources = result.get("sources", [])
 
+if prompt:
+    # Optimistically add the user turn so it renders once in history
+    state.append_message("user", prompt)
+    history_messages = state.current_messages()
+
+    with chat_container:
+        for message in history_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        try:
+            with st.chat_message("assistant"):
+                with st.spinner("Je réfléchis…"):
+                    search_query = build_search_query(
+                        prompt, history_messages
+                    )
+                    contexts = retrieve(search_query, settings)
+                    if not contexts:
+                        bot_answer = FALLBACK
+                        sources = []
+                    else:
+                        result = generate_answer(prompt, contexts, settings)
+                        bot_answer = result.get("answer", FALLBACK)
+                        sources = result.get("sources", [])
+
+                st.markdown(bot_answer)
+                components.render_sources(sources)
             state.append_message("assistant", bot_answer)
-            st.markdown(bot_answer)
-            components.render_sources(sources)
-    except RetrievalError as exc:
-        logger.error("Retrieval error: %s", exc)
-        st.error(user_message(exc))
-    except Exception as exc:  # pragma: no cover - streamlit UI
-        logger.error("Erreur inattendue: %s", exc)
-        st.error("Une erreur est survenue. Réessayez plus tard.")
+        except RetrievalError as exc:
+            logger.error("Retrieval error: %s", exc)
+            st.error(user_message(exc))
+        except Exception as exc:  # pragma: no cover - streamlit UI
+            logger.error("Erreur inattendue: %s", exc)
+            st.error("Une erreur est survenue. Réessayez plus tard.")
+else:
+    with chat_container:
+        for message in state.current_messages():
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
