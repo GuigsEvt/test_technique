@@ -9,6 +9,7 @@ from app.rag.ingest import ingest_file
 from app.rag.store import (
     count_chunks,
     delete_document,
+    fetch_document_chunks,
     get_collection,
     load_registry,
     save_registry,
@@ -64,10 +65,25 @@ if not registry:
     st.info("Aucun document indexé pour le moment.")
 else:
     for doc_id, info in registry.items():
-        cols = st.columns([3, 2, 1])
+        cols = st.columns([3, 2, 1, 1])
         cols[0].markdown(f"**{info.get('filename', 'N/A')}**")
         cols[1].markdown(f"Chunks: {info.get('chunk_count', '?')}")
-        if cols[2].button("Supprimer", key=doc_id):
+
+        with cols[2].popover("👁️ Aperçu", use_container_width=True):
+            try:
+                preview_chunks = fetch_document_chunks(collection, doc_id, limit=3)
+            except VectorStoreError as exc:
+                st.error(user_message(exc))
+            else:
+                if not preview_chunks:
+                    st.info("Aucun contenu trouvé dans l'index.")
+                for chunk in preview_chunks:
+                    meta = chunk.get("metadata", {})
+                    idx = meta.get("chunk_index", "?")
+                    st.markdown(f"**Chunk {idx}**")
+                    st.caption(chunk.get("text", "").strip())
+
+        if cols[3].button("Supprimer", key=doc_id):
             try:
                 delete_document(collection, doc_id)
                 registry.pop(doc_id, None)

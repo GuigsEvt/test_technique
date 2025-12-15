@@ -124,3 +124,23 @@ def count_chunks(collection: Collection) -> int:
     except Exception as exc:  # pragma: no cover
         logger.error("Erreur lors du comptage des chunks: %s", exc)
         return 0
+
+
+def fetch_document_chunks(collection: Collection, doc_id: str, limit: int = 3) -> List[dict]:
+    """Retourne un aperçu des chunks d'un document donné."""
+    try:
+        results = collection.get(where={"doc_id": doc_id}, include=["documents", "metadatas"])
+    except Exception as exc:  # pragma: no cover - chroma internal
+        raise VectorStoreError(str(exc)) from exc
+
+    documents = results.get("documents") or []
+    metadatas = results.get("metadatas") or []
+    if not documents or not metadatas:
+        return []
+
+    entries: List[dict] = []
+    for text, metadata in zip(documents, metadatas):
+        entries.append({"text": text, "metadata": metadata})
+
+    entries.sort(key=lambda item: item.get("metadata", {}).get("chunk_index", 0))
+    return entries[:limit]
