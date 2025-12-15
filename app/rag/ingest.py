@@ -8,7 +8,9 @@ from app.core.logging import get_logger
 from app.core.settings import Settings
 from app.core.utils import compute_doc_id, make_chunks, normalize_text, now_iso
 from app.loaders.csv_loader import load_csv
+from app.loaders.docx_loader import load_docx
 from app.loaders.html_loader import load_html
+from app.loaders.pdf_loader import load_pdf
 from app.loaders.txt_loader import load_txt
 from app.rag.store import (
     delete_document,
@@ -24,13 +26,17 @@ LOADERS: dict[str, Callable[[bytes], str]] = {
     ".txt": load_txt,
     ".csv": load_csv,
     ".html": load_html,
+    ".docx": load_docx,
+    ".pdf": load_pdf,
 }
 
 
 def _validate_upload(filename: str, content: bytes) -> str:
     ext = Path(filename).suffix.lower()
     if ext not in LOADERS:
-        raise IngestError("Extension non supportée. Utilisez .txt, .csv ou .html.")
+        raise IngestError(
+            "Extension non supportée. Utilisez .txt, .csv, .html, .docx ou .pdf."
+        )
     if not content or not content.strip():
         raise IngestError("Fichier vide.")
     return ext

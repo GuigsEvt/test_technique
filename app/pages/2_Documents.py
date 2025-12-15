@@ -35,8 +35,8 @@ col2.metric("Chunks", chunk_count)
 
 st.subheader("Uploader des documents")
 uploaded_files = st.file_uploader(
-    "Choisissez des fichiers .txt, .csv, .html",
-    type=["txt", "csv", "html"],
+    "Choisissez des fichiers .txt, .csv, .html, .docx, .pdf",
+    type=["txt", "csv", "html", "docx", "pdf"],
     accept_multiple_files=True,
 )
 

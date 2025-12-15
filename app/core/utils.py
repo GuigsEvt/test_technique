@@ -78,8 +78,8 @@ def make_chunks(
     doc_id: str,
     filename: str,
     source_type: str,
-    max_chars: int = 1200,
-    overlap: int = 180,
+    max_chars: int = 1000,
+    overlap: int = 200,
 ) -> list[tuple[str, str, dict]]:
     """
     Split a text into overlapping chunks of a maximum length.
@@ -89,8 +89,8 @@ def make_chunks(
         doc_id (str): Identifier for the document.
         filename (str): Name of the source file.
         source_type (str): Type or origin of the source.
-        max_chars (int, optional): Max characters per chunk. Defaults to 1200.
-        overlap (int, optional): Overlap between chunks. Defaults to 180.
+        max_chars (int, optional): Max characters per chunk. Defaults to 1000.
+        overlap (int, optional): Overlap between chunks. Defaults to 200.
 
     Returns:
         List[Tuple[str, str, dict]]: Each tuple contains chunk_id, chunk_text, and metadata

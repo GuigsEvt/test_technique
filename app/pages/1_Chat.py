@@ -18,13 +18,13 @@ logger = get_logger(__name__)
 RETRIEVAL_PRESETS = {
     "Exploratoire (recommande)": {
         "top_k": 20,
-        "max_distance": 0.45,
+        "max_distance": 0.55,
         "max_chunks": 8,
         "tagline": "Couverture maximale des données; recommandé pour explorer le corpus.",
     },
     "Strict": {
         "top_k": 12,
-        "max_distance": 0.28,
+        "max_distance": 0.38,
         "max_chunks": 6,
         "tagline": "Priorise la précision; davantage de refus si les sources sont faibles.",
     },

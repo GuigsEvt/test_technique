@@ -27,7 +27,7 @@ def generate_answer(question: str, contexts: list[dict], settings: Settings) -> 
                 {"role": "user", "content": prompt},
             ],
             temperature=0.1,  # Low temperature for more focused answers; ideal for RAGs
-            max_tokens=500,
+            max_tokens=1000,
         )
     except Exception as exc:  # pragma: no cover - network
         raise LLMError(str(exc)) from exc

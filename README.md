@@ -3,7 +3,7 @@
 Application Streamlit multipage (Chat + Documents) avec pipeline RAG strict. Réponses uniquement basées sur les documents uploadés. Vector store Chroma persistant, embeddings et LLM via API OpenAI.
 
 ### Fonctionnalités
-- Upload multiples `.txt`, `.csv`, `.html` avec nettoyage, chunking, embeddings et upsert dans Chroma
+- Upload multiples `.txt`, `.csv`, `.html`, `.docx`, `.pdf` avec nettoyage, chunking, embeddings et upsert dans Chroma
 - Suppression par document (supprime tous les chunks liés)
 - Chat avec historique multi-conversations (persisté en SQLite) et affichage des sources utilisées
 - Garde-fous : refus hors corpus, seuil de similarité, détection basique d'injection
@@ -15,14 +15,21 @@ Application Streamlit multipage (Chat + Documents) avec pipeline RAG strict. Ré
 - app/pages/2_Documents.py : upload, liste, suppression
 - app/core : settings, logging, erreurs, sécurité, utils
 - app/rag : store Chroma, ingestion, retrieval, prompts, génération
-- app/loaders : loaders spécifiques txt/csv/html
+- app/loaders : loaders spécifiques txt/csv/html/docx/pdf
 - app/ui : state session, composants UI
 - scripts/reset_index.py : reset complet (dev)
 - tests : nettoyage, chunking, garde-fous RAG
 
 ### Prérequis
-- Python >= 3.11
+- Python >= 3.12
 - Clé OpenAI via variable d'environnement `OPENAI_API_KEY`
+
+### Import / formats supportés
+- `.txt` : décodage UTF-8 simple
+- `.csv` : conversion texte avec `csv` (tronqué à 200 lignes)
+- `.html` : extraction texte via BeautifulSoup, suppression scripts/styles
+- `.docx` : extraction paragraphes via `python-docx`
+- `.pdf` : conversion en Markdown via `pymupdf4llm` (basé sur PyMuPDF)
 
 ### Installation
 ```bash
