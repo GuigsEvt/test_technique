@@ -12,9 +12,13 @@ FALLBACK = "Je ne sais pas d'après les documents fournis."
 
 def generate_answer(question: str, contexts: list[dict], settings: Settings) -> dict:
     if not contexts:
-        return {"answer": FALLBACK, "sources": []}
+        return {"answer": FALLBACK, "sources": [], "duration_ms": None}
     if not is_prompt_safe(question):
-        return {"answer": "Requête refusée (sécurité).", "sources": []}
+        return {
+            "answer": "Requête refusée (sécurité).",
+            "sources": [],
+            "duration_ms": None,
+        }
 
     prompt = format_user_prompt(question, contexts[: settings.max_chunks])
     client = OpenAI(api_key=settings.openai_api_key)
@@ -35,15 +39,19 @@ def generate_answer(question: str, contexts: list[dict], settings: Settings) -> 
     choice = response.choices[0].message.content if response.choices else ""
     answer_text = (choice or "").strip()
     if not answer_text:
-        return {"answer": FALLBACK, "sources": []}
+        return {"answer": FALLBACK, "sources": [], "duration_ms": None}
     if answer_text == FALLBACK:
-        return {"answer": FALLBACK, "sources": []}
+        return {"answer": FALLBACK, "sources": [], "duration_ms": None}
 
     sources = _format_sources(contexts)
     if not sources:
-        return {"answer": FALLBACK, "sources": []}
+        return {"answer": FALLBACK, "sources": [], "duration_ms": None}
 
-    return {"answer": answer_text, "sources": sources}
+    return {
+        "answer": answer_text,
+        "sources": sources,
+        "duration_ms": None,
+    }
 
 
 def _format_sources(contexts: list[dict]) -> list[dict]:

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from time import perf_counter
 
 import streamlit as st
 
+from app.core import metrics
 from app.core.errors import RetrievalError, user_message
 from app.core.logging import get_logger
 from app.core.settings import get_settings
@@ -49,6 +51,8 @@ try:
 except RuntimeError as exc:
     st.error(str(exc))
     st.stop()
+
+metrics.init_metrics_db(base_settings.metrics_db)
 
 state.init_state(base_settings.conversation_db)
 
@@ -106,6 +110,11 @@ if prompt:
     # Optimistically add the user turn so it renders once in history
     state.append_message("user", prompt)
     history_messages = state.current_messages()
+    prompt_index = len([msg for msg in history_messages if msg.get("role") == "user"])
+    conv_id = st.session_state.current_conversation
+    duration_ms: float | None = None
+    success = False
+    start_time = perf_counter()
 
     with chat_container:
         for message in history_messages:
@@ -124,14 +133,40 @@ if prompt:
                         result = generate_answer(prompt, contexts, settings)
                         bot_answer = result.get("answer", FALLBACK)
                         sources = result.get("sources", [])
+                        success = bool(sources and bot_answer != FALLBACK)
+
+                    duration_ms = (perf_counter() - start_time) * 1000
 
                 st.markdown(bot_answer)
                 components.render_sources(sources)
             state.append_message("assistant", bot_answer)
+            metrics.record_request(
+                base_settings.metrics_db,
+                conv_id=conv_id,
+                prompt_index=prompt_index,
+                success=success,
+                total_ms=duration_ms,
+            )
         except RetrievalError as exc:
+            duration_ms = (perf_counter() - start_time) * 1000
+            metrics.record_request(
+                base_settings.metrics_db,
+                conv_id=conv_id,
+                prompt_index=prompt_index,
+                success=False,
+                total_ms=duration_ms,
+            )
             logger.error("Retrieval error: %s", exc)
             st.error(user_message(exc))
         except Exception as exc:  # pragma: no cover - streamlit UI
+            duration_ms = (perf_counter() - start_time) * 1000
+            metrics.record_request(
+                base_settings.metrics_db,
+                conv_id=conv_id,
+                prompt_index=prompt_index,
+                success=False,
+                total_ms=duration_ms,
+            )
             logger.error("Erreur inattendue: %s", exc)
             st.error("Une erreur est survenue. Réessayez plus tard.")
 else:

@@ -31,6 +31,7 @@ class Settings:
     chroma_dir: Path = CHROMA_DIR
     registry_path: Path = REGISTRY_PATH
     conversation_db: Path = DATA_DIR / "conversations.db"
+    metrics_db: Path = DATA_DIR / "metrics.db"
 
 
 @lru_cache(maxsize=1)
