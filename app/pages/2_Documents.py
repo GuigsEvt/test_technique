@@ -89,6 +89,6 @@ else:
                 registry.pop(doc_id, None)
                 save_registry(settings.registry_path, registry)
                 st.success("Document supprimé")
-                st.experimental_rerun()
+                st.rerun()
             except VectorStoreError as exc:
                 st.error(user_message(exc))
